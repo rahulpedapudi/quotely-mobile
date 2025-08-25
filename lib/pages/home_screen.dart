@@ -1,9 +1,21 @@
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 
-class Homescreen extends StatelessWidget {
+class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
+
+  @override
+  State<Homescreen> createState() => _HomescreenState();
+}
+
+class _HomescreenState extends State<Homescreen> {
+  int selectedImage = 1;
+
+  final List<String> backgrounds = [
+    "Gradient-02.jpg",
+    "Gradient-03.jpg",
+    "Gradient-04.jpg",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +80,7 @@ class Homescreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           image: DecorationImage(
-                            image: AssetImage('Gradient-02.jpg'),
+                            image: AssetImage(backgrounds[selectedImage - 1]),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -123,47 +135,50 @@ class Homescreen extends StatelessWidget {
                       ),
 
                       SizedBox(height: isDesktop ? 45 : (isTablet ? 40 : 35)),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(backgrounds.length, (
+                              index,
+                            ) {
+                              bool isSelected = (selectedImage == index + 1);
 
-                      // Color palette circles
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: isDesktop ? 50 : (isTablet ? 45 : 40),
-                            height: isDesktop ? 50 : (isTablet ? 45 : 40),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage('Gradient-02.jpg'),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedImage = index + 1;
+                                  });
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  padding: const EdgeInsets.all(
+                                    3,
+                                  ), // border padding
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                      width: 3,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: AssetImage(
+                                      backgrounds[index],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
                           ),
-                          const SizedBox(width: 15),
-                          Container(
-                            width: isDesktop ? 50 : (isTablet ? 45 : 40),
-                            height: isDesktop ? 50 : (isTablet ? 45 : 40),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage('Gradient-03.jpg'),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 15),
-                          Container(
-                            width: isDesktop ? 50 : (isTablet ? 45 : 40),
-                            height: isDesktop ? 50 : (isTablet ? 45 : 40),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage('Gradient-04.jpg'),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
 
                       SizedBox(height: isDesktop ? 35 : (isTablet ? 32 : 30)),
