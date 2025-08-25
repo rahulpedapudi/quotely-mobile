@@ -1,5 +1,6 @@
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
+import 'package:quotely/widgets/background_switcher.dart';
+import 'package:quotely/widgets/quote_card.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -32,6 +33,13 @@ class _HomescreenState extends State<Homescreen> {
     double verticalPadding = isDesktop ? 80 : (isTablet ? 70 : 60);
     double maxContentWidth = isDesktop ? 800 : double.infinity;
     double cardHeight = isDesktop ? 500 : (isTablet ? 480 : 460);
+
+    final Map deviceInfo = {
+      "isDesktop": isDesktop,
+      "isTablet": isTablet,
+      "isMobile": isMobile,
+      "cardHeight": cardHeight,
+    };
 
     return Scaffold(
       backgroundColor: Theme.of(
@@ -73,112 +81,26 @@ class _HomescreenState extends State<Homescreen> {
 
                       SizedBox(height: isDesktop ? 45 : (isTablet ? 40 : 35)),
 
-                      // Main quote card with gradient
-                      Container(
-                        height: cardHeight,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: AssetImage(backgrounds[selectedImage - 1]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(
-                            isDesktop ? 40 : (isTablet ? 35 : 30),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Quote icon
-                              SvgPicture.asset("/quote.svg"),
-
-                              const SizedBox(height: 20),
-
-                              // Main quote text
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "The desire to create is one of the deepest yearnings of the human soul.",
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.headlineLarge,
-                                    ),
-
-                                    SizedBox(
-                                      height: isDesktop
-                                          ? 40
-                                          : (isTablet ? 35 : 30),
-                                    ),
-
-                                    // Author attribution
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: Text(
-                                        "— DIETER F. UCHTDORF",
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.headlineMedium,
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      QuoteCard(
+                        quoteInfo: {
+                          "quote":
+                              "The desire to create is one of the deepest yearnings of the human soul.",
+                          "author": "— DIETER F. UCHTDORF",
+                        },
+                        background: backgrounds[selectedImage],
+                        deviceInfo: deviceInfo,
                       ),
 
                       SizedBox(height: isDesktop ? 45 : (isTablet ? 40 : 35)),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(backgrounds.length, (
-                              index,
-                            ) {
-                              bool isSelected = (selectedImage == index + 1);
 
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedImage = index + 1;
-                                  });
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                  ),
-                                  padding: const EdgeInsets.all(
-                                    3,
-                                  ), // border padding
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? Colors.white
-                                          : Colors.transparent,
-                                      width: 3,
-                                    ),
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 25,
-                                    backgroundImage: AssetImage(
-                                      backgrounds[index],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
+                      BackgroundSwitcher(
+                        backgrounds: backgrounds,
+                        selectedImage: selectedImage,
+                        onSelected: (index) {
+                          setState(() {
+                            selectedImage = index;
+                          });
+                        },
                       ),
 
                       SizedBox(height: isDesktop ? 35 : (isTablet ? 32 : 30)),
