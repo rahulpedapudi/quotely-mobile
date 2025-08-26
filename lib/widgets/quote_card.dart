@@ -15,9 +15,14 @@ class QuoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return // Main quote card with gradient
-    Container(
-      height: deviceInfo['cardHeight'],
+    return Container(
+      padding: EdgeInsets.all(
+        deviceInfo['isDesktop'] ? 40 : (deviceInfo['isTablet'] ? 35 : 30),
+      ),
+      constraints: BoxConstraints(
+        minHeight: deviceInfo['cardHeight'],
+        maxHeight: 600,
+      ),
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
@@ -26,49 +31,53 @@ class QuoteCard extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(
-          deviceInfo['isDesktop'] ? 40 : (deviceInfo['isTablet'] ? 35 : 30),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Quote icon
-            SvgPicture.asset("/quote.svg"),
 
-            const SizedBox(height: 20),
+      // It creates the space around all the content.
+      child:
+          // The Stack operates completely WITHIN the padded area.
+          Stack(
+            children: [
+              // Aligns to the top-left of the padded space
+              Align(
+                alignment: Alignment.topLeft,
+                child: SvgPicture.asset("assets/quote.svg"),
+              ),
 
-            // Main quote text
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    quoteInfo['quote'],
-                    style: Theme.of(context).textTheme.headlineLarge,
-                  ),
-
-                  SizedBox(
-                    height: deviceInfo['isDesktop']
-                        ? 40
-                        : (deviceInfo['isTablet'] ? 35 : 30),
-                  ),
-                  // Author attribution
-                  SizedBox(
-                    width: double.infinity,
+              // Aligns to the center-left of the padded space
+              Positioned(
+                top: 0,
+                right: 0,
+                left: 0,
+                bottom: 0,
+                child: Center(
+                  child: Align(
+                    alignment: const Alignment(
+                      -0.1,
+                      0,
+                    ), // Slightly left of center
                     child: Text(
-                      quoteInfo['author'],
-                      style: Theme.of(context).textTheme.headlineMedium,
-                      textAlign: TextAlign.right,
+                      quoteInfo['quote'],
+                      style: Theme.of(context).textTheme.headlineLarge,
+                      textAlign: TextAlign.left,
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+
+              // Aligns to the bottom-left of the padded space
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    quoteInfo['author'],
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ),
+              ),
+            ],
+          ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:quotely/models/quote.dart';
 import 'package:quotely/widgets/background_switcher.dart';
 import 'package:quotely/widgets/quote_card.dart';
+import 'package:quotely/services/quote_service.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -10,12 +12,40 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  int selectedImage = 1;
+  Quote? currentQuote;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchQuote();
+  }
+
+  Future<void> fetchQuote() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final quote = await QuoteService.fetchQuote();
+      setState(() {
+        currentQuote = quote;
+      });
+    } catch (e) {
+      debugPrint("Error Fetching $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  int selectedImage = 0;
 
   final List<String> backgrounds = [
-    "Gradient-02.jpg",
-    "Gradient-03.jpg",
-    "Gradient-04.jpg",
+    "assets/Gradient-02.jpg",
+    "assets/Gradient-03.jpg",
+    "assets/Gradient-04.jpg",
   ];
 
   @override
@@ -30,7 +60,7 @@ class _HomescreenState extends State<Homescreen> {
 
     // Responsive padding and sizing
     double horizontalPadding = isDesktop ? 60 : (isTablet ? 40 : 30);
-    double verticalPadding = isDesktop ? 80 : (isTablet ? 70 : 60);
+    double verticalPadding = isDesktop ? 80 : (isTablet ? 70 : 30);
     double maxContentWidth = isDesktop ? 800 : double.infinity;
     double cardHeight = isDesktop ? 500 : (isTablet ? 480 : 460);
 
@@ -81,17 +111,32 @@ class _HomescreenState extends State<Homescreen> {
 
                       SizedBox(height: isDesktop ? 45 : (isTablet ? 40 : 35)),
 
-                      QuoteCard(
-                        quoteInfo: {
-                          "quote":
-                              "The desire to create is one of the deepest yearnings of the human soul.",
-                          "author": "— DIETER F. UCHTDORF",
-                        },
-                        background: backgrounds[selectedImage],
-                        deviceInfo: deviceInfo,
+                      Center(
+                        child: isLoading
+                            ? SizedBox(
+                                height: 600,
+                                width: double.infinity,
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                            : currentQuote == null
+                            ? QuoteCard(
+                                quoteInfo: {"quote": "No Quote", "author": "-"},
+                                background: backgrounds[selectedImage],
+                                deviceInfo: deviceInfo,
+                              )
+                            : QuoteCard(
+                                quoteInfo: {
+                                  "quote": currentQuote?.text,
+                                  "author": '— ${currentQuote?.author}',
+                                },
+                                background: backgrounds[selectedImage],
+                                deviceInfo: deviceInfo,
+                              ),
                       ),
 
-                      SizedBox(height: isDesktop ? 45 : (isTablet ? 40 : 35)),
+                      SizedBox(height: isDesktop ? 45 : (isTablet ? 40 : 20)),
 
                       BackgroundSwitcher(
                         backgrounds: backgrounds,
@@ -103,60 +148,64 @@ class _HomescreenState extends State<Homescreen> {
                         },
                       ),
 
-                      SizedBox(height: isDesktop ? 35 : (isTablet ? 32 : 30)),
+                      SizedBox(height: isDesktop ? 35 : (isTablet ? 32 : 15)),
 
-                      // Bottom buttons
                       Row(
                         children: [
+                          // 1. Use Expanded to make the button take up available space
                           Expanded(
-                            child: Container(
+                            child: SizedBox(
+                              // Set the height on the button's parent or directly in its style
                               height: isDesktop ? 60 : (isTablet ? 58 : 55),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Colors.white,
-                              ),
-                              child: Center(
-                                child: Row(
-                                  spacing: 5,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      "Another Thought",
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.labelMedium,
-                                    ),
-                                    Icon(
-                                      Icons.refresh,
-                                      color: Colors.black,
-                                      weight: 400,
-                                      size: isDesktop
-                                          ? 24
-                                          : (isTablet ? 22 : 20),
-                                    ),
-                                  ],
+                              child: ElevatedButton.icon(
+                                onPressed: fetchQuote,
+
+                                // 2. Use ElevatedButton.icon for a cleaner button with an icon
+                                icon: Icon(Icons.refresh),
+                                iconAlignment: IconAlignment.end,
+                                label: Text(
+                                  "Another Thought",
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelMedium,
+                                ),
+                                // 3. Style the button directly instead of wrapping it in a Container
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.white, // Background color
+                                  foregroundColor:
+                                      Colors.black, // Color for text and icon
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-
                           const SizedBox(width: 15),
 
-                          Container(
+                          // 4. Use an IconButton to make the download icon tappable
+                          SizedBox(
                             height: isDesktop ? 60 : (isTablet ? 58 : 55),
                             width: isDesktop ? 60 : (isTablet ? 58 : 55),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                width: 2,
-                                color: Theme.of(context).colorScheme.onSurface,
+                            child: IconButton(
+                              onPressed: () {},
+                              icon: Icon(
+                                Icons.download,
+                                color: Colors.white,
+                                size: isDesktop ? 24 : (isTablet ? 22 : 20),
                               ),
-                            ),
-                            child: Icon(
-                              Icons.download,
-                              color: Colors.white,
-                              size: isDesktop ? 24 : (isTablet ? 22 : 20),
+                              style: IconButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    width: 2,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],

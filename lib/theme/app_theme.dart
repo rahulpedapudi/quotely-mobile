@@ -33,7 +33,7 @@ class AppTheme {
           color: const Color(0xFFF0F0F0),
         ),
         labelMedium: GoogleFonts.montserrat(
-          fontSize: 16,
+          fontSize: 12,
           fontWeight: FontWeight.w700,
           color: const Color(0xFF080808),
         ),
