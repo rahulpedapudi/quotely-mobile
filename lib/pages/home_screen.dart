@@ -3,6 +3,8 @@ import 'package:quotely/models/quote.dart';
 import 'package:quotely/widgets/background_switcher.dart';
 import 'package:quotely/widgets/quote_card.dart';
 import 'package:quotely/services/quote_service.dart';
+import 'package:flutter/services.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -142,6 +144,7 @@ class _HomescreenState extends State<Homescreen> {
                         backgrounds: backgrounds,
                         selectedImage: selectedImage,
                         onSelected: (index) {
+                          HapticFeedback.mediumImpact();
                           setState(() {
                             selectedImage = index;
                           });
@@ -158,7 +161,10 @@ class _HomescreenState extends State<Homescreen> {
                               // Set the height on the button's parent or directly in its style
                               height: isDesktop ? 60 : (isTablet ? 58 : 55),
                               child: ElevatedButton.icon(
-                                onPressed: fetchQuote,
+                                onPressed: () {
+                                  fetchQuote();
+                                  HapticFeedback.mediumImpact();
+                                },
 
                                 // 2. Use ElevatedButton.icon for a cleaner button with an icon
                                 icon: Icon(Icons.refresh),

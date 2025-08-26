@@ -2,10 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:quotely/pages/home_screen.dart';
 import 'package:quotely/theme/app_theme.dart';
-// Import Firebase Core
-import 'firebase_options.dart'; // Import the generated file
+import 'firebase_options.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() async {
+  setPathUrlStrategy();
+
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
